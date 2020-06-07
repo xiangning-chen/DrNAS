@@ -1,5 +1,6 @@
 import os
 import sys
+sys.path.insert(0, '../')
 import time
 import glob
 import numpy as np
@@ -20,7 +21,7 @@ from model import NetworkCIFAR as Network
 parser = argparse.ArgumentParser("cifar")
 parser.add_argument('--data', type=str, default='datapath', help='location of the data corpus')
 parser.add_argument('--dataset', type=str, default='cifar10', help='choose dataset')
-parser.add_argument('--batch_size', type=int, default=96, help='batch size')
+parser.add_argument('--batch_size', type=int, default=64, help='batch size')
 parser.add_argument('--learning_rate', type=float, default=0.025, help='init learning rate')
 parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
 parser.add_argument('--weight_decay', type=float, default=3e-4, help='weight decay')
@@ -37,7 +38,7 @@ parser.add_argument('--cutout_length', type=int, default=16, help='cutout length
 parser.add_argument('--drop_path_prob', type=float, default=0.3, help='drop path probability')
 parser.add_argument('--save', type=str, default='exp', help='experiment name')
 parser.add_argument('--seed', type=int, default=0, help='random seed')
-parser.add_argument('--arch', type=str, default='PCDARTS', help='which architecture to use')
+parser.add_argument('--arch', type=str, default='DrNAS_cifar10', help='which architecture to use')
 parser.add_argument('--grad_clip', type=float, default=5, help='gradient clipping')
 args = parser.parse_args()
 

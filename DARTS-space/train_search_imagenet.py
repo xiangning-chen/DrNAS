@@ -1,5 +1,6 @@
 import os
 import sys
+sys.path.insert(0, '../')
 import time
 import glob
 import numpy as np
@@ -24,7 +25,7 @@ import utils
 parser = argparse.ArgumentParser("imagenet")
 parser.add_argument('--workers', type=int, default=16, help='number of workers to load dataset')
 parser.add_argument('--data', type=str, default='datapath', help='location of the data corpus')
-parser.add_argument('--batch_size', type=int, default=256, help='batch size')
+parser.add_argument('--batch_size', type=int, default=512, help='batch size')
 parser.add_argument('--learning_rate', type=float, default=0.5, help='init learning rate')
 parser.add_argument('--learning_rate_min', type=float, default=0.0, help='min learning rate')
 parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
@@ -127,9 +128,9 @@ def main():
 
     # configure progressive parameter
     epoch = 0
-    ks = [6, 4, 1]
-    num_keeps = [7, 4, 1]
-    train_epochs = [2, 2] if 'debug' in args.save else [50, 0]
+    ks = [6, 3]
+    num_keeps = [7, 4]
+    train_epochs = [2, 2] if 'debug' in args.save else [25, 25]
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, float(sum(train_epochs)), eta_min=args.learning_rate_min)
 
@@ -166,17 +167,18 @@ def main():
             logging.info('Epoch time: %ds.', epoch_duration)
             # utils.save(model, os.path.join(args.save, 'weights.pt'))
 
-        model.module.pruning(num_keeps[i+1])
-        model.module.wider(ks[i+1])
-        optimizer = configure_optimizer(optimizer, torch.optim.SGD(
-            model.parameters(),
-            args.learning_rate,
-            momentum=args.momentum,
-            weight_decay=args.weight_decay))
-        scheduler = configure_scheduler(scheduler, torch.optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, float(sum(train_epochs)), eta_min=args.learning_rate_min))
-        logging.info('pruning finish, %d ops left per edge', num_keeps[i+1])
-        logging.info('network wider finish, current pc parameter %d', ks[i+1])
+        if not i == len(train_epochs) - 1:
+            model.module.pruning(num_keeps[i+1])
+            model.module.wider(ks[i+1])
+            optimizer = configure_optimizer(optimizer, torch.optim.SGD(
+                model.parameters(),
+                args.learning_rate,
+                momentum=args.momentum,
+                weight_decay=args.weight_decay))
+            scheduler = configure_scheduler(scheduler, torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer, float(sum(train_epochs)), eta_min=args.learning_rate_min))
+            logging.info('pruning finish, %d ops left per edge', num_keeps[i+1])
+            logging.info('network wider finish, current pc parameter %d', ks[i+1])
     
     genotype = model.module.genotype()
     logging.info('genotype = %s', genotype)
@@ -236,8 +238,8 @@ def train(train_queue, valid_queue, model, optimizer, optimizer_a, criterion, ep
                 start_time = time.time()
             logging.info('TRAIN Step: %03d Objs: %e R1: %f R5: %f Duration: %ds',
                          step, objs.avg, top1.avg, top5.avg, duration)
-            if 'debug' in args.save:
-                break
+        if 'debug' in args.save:
+            break
 
     return top1.avg, objs.avg
 

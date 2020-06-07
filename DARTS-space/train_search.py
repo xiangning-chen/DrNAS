@@ -1,5 +1,6 @@
 import os
 import sys
+sys.path.insert(0, '../')
 import time
 import glob
 import numpy as np
@@ -113,9 +114,9 @@ def main():
 
   # configure progressive parameter
   epoch = 0
-  ks = [6, 4, 1]
-  num_keeps = [7, 3, 1]
-  train_epochs = [3, 3] if 'debug' in args.save else [50, 50]
+  ks = [6, 4]
+  num_keeps = [7, 4]
+  train_epochs = [2, 2] if 'debug' in args.save else [25, 25]
   scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
     optimizer, float(sum(train_epochs)), eta_min=args.learning_rate_min)
 
@@ -140,18 +141,19 @@ def main():
       scheduler.step()
       utils.save(model, os.path.join(args.save, 'weights.pt'))
     
-    model.pruning(num_keeps[i+1])
-    # architect.pruning([model.mask_normal, model.mask_reduce])
-    model.wider(ks[i+1])
-    optimizer = configure_optimizer(optimizer, torch.optim.SGD(
-      model.parameters(),
-      args.learning_rate,
-      momentum=args.momentum,
-      weight_decay=args.weight_decay))
-    scheduler = configure_scheduler(scheduler, torch.optim.lr_scheduler.CosineAnnealingLR(
-      optimizer, float(sum(train_epochs)), eta_min=args.learning_rate_min))
-    logging.info('pruning finish, %d ops left per edge', num_keeps[i+1])
-    logging.info('network wider finish, current pc parameter %d', ks[i+1])
+    if not i == len(train_epochs) - 1:
+      model.pruning(num_keeps[i+1])
+      # architect.pruning([model.mask_normal, model.mask_reduce])
+      model.wider(ks[i+1])
+      optimizer = configure_optimizer(optimizer, torch.optim.SGD(
+        model.parameters(),
+        args.learning_rate,
+        momentum=args.momentum,
+        weight_decay=args.weight_decay))
+      scheduler = configure_scheduler(scheduler, torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, float(sum(train_epochs)), eta_min=args.learning_rate_min))
+      logging.info('pruning finish, %d ops left per edge', num_keeps[i+1])
+      logging.info('network wider finish, current pc parameter %d', ks[i+1])
 
   genotype = model.genotype()
   logging.info('genotype = %s', genotype)
