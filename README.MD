@@ -1,4 +1,8 @@
-# DrNAS: Dirichlet Architecture Search
+# DrNAS
+
+Code accompanying the paper  
+DrNAS: Dirichlet Architecture Search [paper](https://arxiv.org/abs/2006.10355)  
+Xiangning Chen, Ruochen Wang, Minhao Cheng, Xiaocheng Tang, Cho-Jui Hsieh
 
 This code is based on the implementation of [NAS-Bench-201](https://github.com/D-X-Y/AutoDL-Projects) and [PC-DARTS](https://github.com/yuhuixu1993/PC-DARTS).
 
