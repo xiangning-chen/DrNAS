@@ -1,8 +1,8 @@
 # DrNAS
 
 Code accompanying the paper  
-***DrNAS: Dirichlet Neural Architecture Search*** [paper](https://arxiv.org/abs/2006.10355)  
-Xiangning Chen, Ruochen Wang, Minhao Cheng, Xiaocheng Tang, Cho-Jui Hsieh
+[ICLR'2021](https://iclr.cc/): ***DrNAS: Dirichlet Neural Architecture Search*** [paper](https://openreview.net/forum?id=9FWas6YbmB3)  
+Xiangning Chen*, Ruochen Wang*, Minhao Cheng*, Xiaocheng Tang, Cho-Jui Hsieh
 
 This code is based on the implementation of [NAS-Bench-201](https://github.com/D-X-Y/AutoDL-Projects) and [PC-DARTS](https://github.com/yuhuixu1993/PC-DARTS).
 
