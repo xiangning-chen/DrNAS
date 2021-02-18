@@ -1,3 +1,5 @@
 .vscode
-experiments/
 __pycache__
+
+experiments/
+201-space/nas_201_api

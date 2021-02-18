@@ -14,8 +14,12 @@ class Architect(object):
     self.network_momentum = args.momentum
     self.network_weight_decay = args.weight_decay
     self.model = model
+    if args.reg_type == 'l2':
+      weight_decay = args.reg_scale
+    elif args.reg_type == 'kl':
+      weight_decay = 0
     self.optimizer = torch.optim.Adam(self.model.arch_parameters(),
-        lr=args.arch_learning_rate, betas=(0.5, 0.999), weight_decay=args.arch_weight_decay)
+        lr=args.arch_learning_rate, betas=(0.5, 0.999), weight_decay=weight_decay)
 
   def _compute_unrolled_model(self, input, target, eta, network_optimizer):
     loss = self.model._loss(input, target)

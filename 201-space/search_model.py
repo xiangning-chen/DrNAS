@@ -10,10 +10,12 @@ from genotypes import Structure
 from torch.autograd import Variable
 from utils import process_step_matrix, prune
 import logging
+from torch.distributions.dirichlet import Dirichlet
+from torch.distributions.kl import kl_divergence
 
 class TinyNetwork(nn.Module):
 
-  def __init__(self, C, N, max_nodes, num_classes, criterion, search_space, affine=False, track_running_stats=True, k=2, species='softmax'):
+  def __init__(self, C, N, max_nodes, num_classes, criterion, search_space, affine=False, track_running_stats=True, k=2, species='softmax', reg_type='l2', reg_scale=1e-3):
     super(TinyNetwork, self).__init__()
     self._C        = C
     self._layerN   = N
@@ -48,10 +50,26 @@ class TinyNetwork(nn.Module):
     self._arch_parameters = nn.Parameter( 1e-3*torch.randn(num_edge, len(search_space)) )
     self.tau = 10 if species == 'gumbel' else None
     self._mask = None
+
+    #### reg
+    self.reg_type = reg_type
+    self.reg_scale = reg_scale
+    self.anchor = Dirichlet(torch.ones_like(self._arch_parameters).cuda())
   
   def _loss(self, input, target):
     logits = self(input)
-    return self._criterion(logits, target)
+    loss = self._criterion(logits, target)
+    if self.reg_type == 'kl':
+      loss += self._get_kl_reg()
+    return loss
+
+  def _get_kl_reg(self):
+    assert(self.species == 'dirichlet') # kl implemented only for Dirichlet
+    cons = (F.elu(self._arch_parameters) + 1)
+    q = Dirichlet(cons)
+    p = self.anchor
+    kl_reg = self.reg_scale * torch.sum(kl_divergence(q, p))
+    return kl_reg
 
   def get_weights(self):
     xlist = list( self.stem.parameters() ) + list( self.cells.parameters() )

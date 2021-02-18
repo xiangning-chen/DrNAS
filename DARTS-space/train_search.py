@@ -40,8 +40,10 @@ parser.add_argument('--grad_clip', type=float, default=5, help='gradient clippin
 parser.add_argument('--train_portion', type=float, default=0.5, help='portion of training data')
 parser.add_argument('--unrolled', action='store_true', default=False, help='use one-step unrolled validation loss')
 parser.add_argument('--arch_learning_rate', type=float, default=6e-4, help='learning rate for arch encoding')
-parser.add_argument('--arch_weight_decay', type=float, default=1e-3, help='weight decay for arch encoding')
 parser.add_argument('--k', type=int, default=6, help='init partial channel parameter')
+#### regularization
+parser.add_argument('--reg_type', type=str, default='l2', choices=['l2', 'kl'], help='regularization type')
+parser.add_argument('--reg_scale', type=float, default=1e-3, help='scaling factor of the regularization term, default value is proper for l2, for kl you might adjust reg_scale to match l2')
 args = parser.parse_args()
 
 args.save = '../experiments/{}/search-progressive-{}-{}-{}'.format(
@@ -80,7 +82,8 @@ def main():
 
   criterion = nn.CrossEntropyLoss()
   criterion = criterion.cuda()
-  model = Network(args.init_channels, CIFAR_CLASSES, args.layers, criterion, k=args.k)
+  model = Network(args.init_channels, CIFAR_CLASSES, args.layers, criterion, k=args.k,
+                  reg_type=args.reg_type, reg_scale=args.reg_scale)
   model = model.cuda()
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 

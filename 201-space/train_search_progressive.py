@@ -48,10 +48,12 @@ parser.add_argument('--grad_clip', type=float, default=5, help='gradient clippin
 parser.add_argument('--train_portion', type=float, default=0.5, help='portion of training data')
 parser.add_argument('--unrolled', action='store_true', default=False, help='use one-step unrolled validation loss')
 parser.add_argument('--arch_learning_rate', type=float, default=3e-4, help='learning rate for arch encoding')
-parser.add_argument('--arch_weight_decay', type=float, default=1e-3, help='weight decay for arch encoding')
 parser.add_argument('--tau_max', type=float, default=10, help='Max temperature (tau) for the gumbel softmax.')
 parser.add_argument('--tau_min', type=float, default=1, help='Min temperature (tau) for the gumbel softmax.')
 parser.add_argument('--k', type=int, default=4, help='init partial channel parameter')
+#### regularization
+parser.add_argument('--reg_type', type=str, default='l2', choices=['l2', 'kl'], help='regularization type, kl is implemented for dirichlet only')
+parser.add_argument('--reg_scale', type=float, default=1e-3, help='scaling factor of the regularization term, default value is proper for l2, for kl you might adjust reg_scale to match l2')
 args = parser.parse_args()
 
 args.save = '../experiments/nasbench201/{}-search-progressive-{}-{}-{}'.format(
@@ -62,8 +64,6 @@ if args.unrolled:
     args.save += '-unrolled'
 if not args.weight_decay == 3e-4:
     args.save += '-weight_l2-' + str(args.weight_decay)
-if not args.arch_weight_decay == 1e-3:
-    args.save += '-alpha_l2-' + str(args.arch_weight_decay)
 args.save += '-pc-' + str(args.k)
 
 utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
@@ -133,7 +133,7 @@ def main():
                             criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='gumbel')
     elif args.method == 'dirichlet':
         model = TinyNetwork(C=args.init_channels, N=5, max_nodes=4, num_classes=n_classes,
-                            criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='dirichlet')
+                            criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='dirichlet', reg_type=args.reg_type, reg_scale=args.reg_scale)
     elif args.method == 'darts':
         model = TinyNetwork(C=args.init_channels, N=5, max_nodes=4, num_classes=n_classes,
                             criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='softmax')

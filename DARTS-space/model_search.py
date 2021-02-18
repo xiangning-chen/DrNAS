@@ -7,6 +7,8 @@ from torch.autograd import Variable
 from genotypes import PRIMITIVES, Genotype
 from operations import *
 from utils import process_step_vector, process_step_matrix, prune
+from torch.distributions.dirichlet import Dirichlet
+from torch.distributions.kl import kl_divergence
 
 
 def channel_shuffle(x, groups):
@@ -103,7 +105,8 @@ class Cell(nn.Module):
 
 class Network(nn.Module):
 
-  def __init__(self, C, num_classes, layers, criterion, steps=4, multiplier=4, stem_multiplier=3, k=4):
+  def __init__(self, C, num_classes, layers, criterion, steps=4, multiplier=4, stem_multiplier=3, k=4,
+               reg_type='l2', reg_scale=1e-3):
     super(Network, self).__init__()
     self._C = C
     self._num_classes = num_classes
@@ -137,6 +140,12 @@ class Network(nn.Module):
     self.classifier = nn.Linear(C_prev, num_classes)
 
     self._initialize_alphas()
+
+    #### reg
+    self.reg_type = reg_type
+    self.reg_scale = reg_scale
+    self.anchor_normal = Dirichlet(torch.ones_like(self.alphas_normal).cuda())
+    self.anchor_reduce = Dirichlet(torch.ones_like(self.alphas_reduce).cuda())
 
   def new(self):
     model_new = Network(self._C, self._num_classes, self._layers, self._criterion).cuda()
@@ -183,7 +192,21 @@ class Network(nn.Module):
 
   def _loss(self, input, target):
     logits = self(input)
-    return self._criterion(logits, target) 
+    loss = self._criterion(logits, target) 
+    if self.reg_type == 'kl':
+      loss += self._get_kl_reg()
+    return loss
+
+  def _get_kl_reg(self):
+    cons_normal = (F.elu(self.alphas_normal) + 1)
+    cons_reduce = (F.elu(self.alphas_reduce) + 1)
+    q_normal = Dirichlet(cons_normal)
+    q_reduce = Dirichlet(cons_reduce)
+    p_normal = self.anchor_normal
+    p_reduce = self.anchor_reduce
+    kl_reg = self.reg_scale * (torch.sum(kl_divergence(q_reduce, p_reduce)) + \
+                               torch.sum(kl_divergence(q_normal, p_normal)))
+    return kl_reg
 
   def _initialize_alphas(self):
     k = sum(1 for i in range(self._steps) for n in range(2+i))
