@@ -1,6 +1,6 @@
 # DrNAS
 
----
+
 
 ## About
 Code accompanying the paper  
@@ -11,7 +11,7 @@ This code is based on the implementation of [NAS-Bench-201](https://github.com/D
 
 This paper proposes a novel differentiable architecture search method by formulating it into a distribution learning problem. We treat the continuously relaxed architecture mixing weight as random variables, modeled by Dirichlet distribution. With recently developed pathwise derivatives, the Dirichlet parameters can be easily optimized with gradient-based optimizer in an end-to-end manner. This formulation improves the generalization ability and induces stochasticity that naturally encourages exploration in the search space. Furthermore, to alleviate the large memory consumption of differentiable NAS, we propose a simple yet effective progressive learning scheme that enables searching directly on large-scale tasks, eliminating the gap between search and evaluation phases. Extensive experiments demonstrate the effectiveness of our method. Specifically, we obtain a test error of **2.46%** for CIFAR-10, **23.7%** for ImageNet under the mobile setting. On NAS-Bench-201, we also achieve **state-of-the-art** results on all three datasets and provide insights for the effective design of neural architecture search algorithms.
 
----
+
 ## Results
 
 ### On NAS-Bench-201
@@ -58,7 +58,7 @@ DrNAS can perform a direct search on ImageNet and achieves a top-1 test error be
 
 <sup>*<sup> not a direct search
 
----
+
 
 ## Usage
 
@@ -85,7 +85,7 @@ DrNAS can perform a direct search on ImageNet and achieves a top-1 test error be
 
 * ```ImageNet: cd DARTS-space && python train_imagenet.py --auxiliary```
 
----
+
 
 ## Reference
 If you find this code useful in your research please cite
@@ -99,7 +99,7 @@ If you find this code useful in your research please cite
 }
 ```
 
----
+
 
 ## Related Publications
 
