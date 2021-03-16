@@ -52,8 +52,10 @@ parser.add_argument('--tau_max', type=float, default=10, help='Max temperature (
 parser.add_argument('--tau_min', type=float, default=1, help='Min temperature (tau) for the gumbel softmax.')
 parser.add_argument('--k', type=int, default=4, help='init partial channel parameter')
 #### regularization
-parser.add_argument('--reg_type', type=str, default='l2', choices=['l2', 'kl'], help='regularization type, kl is implemented for dirichlet only')
-parser.add_argument('--reg_scale', type=float, default=1e-3, help='scaling factor of the regularization term, default value is proper for l2, for kl you might adjust reg_scale to match l2')
+parser.add_argument('--reg_type', type=str, default='l2', choices=[
+                    'l2', 'kl'], help='regularization type, kl is implemented for dirichlet only')
+parser.add_argument('--reg_scale', type=float, default=1e-3,
+                    help='scaling factor of the regularization term, default value is proper for l2, for kl you might adjust reg_scale to match l2')
 args = parser.parse_args()
 
 args.save = '../experiments/nasbench201/{}-search-progressive-{}-{}-{}'.format(
@@ -133,7 +135,8 @@ def main():
                             criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='gumbel')
     elif args.method == 'dirichlet':
         model = TinyNetwork(C=args.init_channels, N=5, max_nodes=4, num_classes=n_classes,
-                            criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='dirichlet', reg_type=args.reg_type, reg_scale=args.reg_scale)
+                            criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='dirichlet', 
+                            reg_type=args.reg_type, reg_scale=args.reg_scale)
     elif args.method == 'darts':
         model = TinyNetwork(C=args.init_channels, N=5, max_nodes=4, num_classes=n_classes,
                             criterion=criterion, search_space=NAS_BENCH_201, k=args.k, species='softmax')
