@@ -70,7 +70,7 @@ DrNAS can perform a direct search on ImageNet and achieves a top-1 test error be
 * Data preparation: Please first download the 201 benchmark file and prepare the api follow [this repository](https://github.com/D-X-Y/NAS-Bench-201).
 
 * ```cd 201-space && python train_search.py```
-* ```With Progressively Pruing: cd 201-space && python train_search_progressive.py```
+* ```With Progressively Pruning: cd 201-space && python train_search_progressive.py```
 
 **Search on DARTS Space:**
 
