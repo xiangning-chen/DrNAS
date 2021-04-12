@@ -105,4 +105,4 @@ If you find this code useful in your research please cite
 ## Related Publications
 
 * Xiangning Chen, Cho-Jui Hsieh. [Stabilizing Differentiable Architecture Search via Perturbation-based Regularization](http://proceedings.mlr.press/v119/chen20f.html). ICML 2020. [Code](https://github.com/xiangning-chen/SmoothDARTS).
-* Ruochen Wang, Minhao Cheng, Xiangning Chen, Xiaocheng Tang, Cho-Jui Hsieh. [Rethinking Architecture Selection in Differentiable NAS](https://openreview.net/forum?id=PKubaeJkw3). ICLR 2021 (oral).
+* Ruochen Wang, Minhao Cheng, Xiangning Chen, Xiaocheng Tang, Cho-Jui Hsieh. [Rethinking Architecture Selection in Differentiable NAS](https://openreview.net/forum?id=PKubaeJkw3). ICLR 2021 (oral). [Code](https://github.com/ruocwang/darts-pt).
